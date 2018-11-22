@@ -1,6 +1,6 @@
 var path = require('path');
 var fs = require('fs');
-var lunr = require('lunr');
+var lunr = require('lunr-mutable-indexes');
 var sanitizeHtml = require('sanitize-html');
 
 exports.clear_session_value = function (session, session_var){
@@ -54,7 +54,7 @@ exports.buildIndex = function(db, callback){
     var config = this.read_config();
     exports.dbQuery(db.kb, {kb_published: 'true'}, null, null, function (err, kb_list){
         // build the index
-        var index = new lunr.Index;
+        var index = new lunr.Builder();
         index.field('kb_title');
         index.field('kb_keywords');
         index.ref('id');
@@ -85,9 +85,9 @@ exports.buildIndex = function(db, callback){
 
             index.add(doc);
         });
-        callback(index);
+        callback(index.build());
     });
-}
+};
 
 // This is called on the suggest url. If the value is set to false in the config
 // a 403 error is rendered.
